@@ -14,7 +14,9 @@ import {
 import { Layout } from "~/components/AppShell/appshell";
 import { getUser } from "~/session.server";
 import stylesheet from "~/tailwind.css";
+import { theme } from "~/theme";
 import "@mantine/core/styles.css";
+
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -33,9 +35,10 @@ export default function App() {
       <meta name="viewport" content="width=device-width,initial-scale=1" />
       <Meta />
       <Links />
+      <ColorSchemeScript />
     </head>
     <body className="h-full">
-    <MantineProvider>
+    <MantineProvider theme={theme} defaultColorScheme={"light"}>
       <Layout>
         <Outlet />
       </Layout>
