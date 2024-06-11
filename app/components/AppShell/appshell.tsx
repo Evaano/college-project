@@ -1,7 +1,8 @@
-import { AppShell, Text, Group, rem } from "@mantine/core";
+import { AppShell, Group, rem } from "@mantine/core";
 import { useHeadroom } from "@mantine/hooks";
+import React from "react";
 
-export function Layout({ children }) {
+export function Layout({ children }: { children: React.ReactNode }) {
   const pinned = useHeadroom({ fixedAt: 120 });
 
   return (
