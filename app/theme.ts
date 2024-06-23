@@ -13,7 +13,9 @@ const themeOverride = createTheme({
     // #f9ac4e - earth-yellow-5
     "earth-yellow": ["#fcd09a", "#fbc787", "#fabe74", "#fab561", "#f9ac4e", "#f8a33b", "#f89a28", "#f79115", "#f08808", "#dd7d08"],
     // #e8e7e3 - sea-salt-1
-    "sea-salt": ["#e8e7e3", "#dfded8", "#d6d5cd", "#cdcbc3", "#c5c2b8", "#bcb9ad", "#b3b0a2", "#aaa698", "#a19d8d", "#989482"]
+    "sea-salt": ["#e8e7e3", "#dfded8", "#d6d5cd", "#cdcbc3", "#c5c2b8", "#bcb9ad", "#b3b0a2", "#aaa698", "#a19d8d", "#989482"],
+    //#07393C
+    "main-green": ["#edfcfd", "#dcf6f8", "#b3eef2","#89e6eb","#6bdee6","#5adbe3","#4fd8e1","#41bfc8","#32aab2","#12949b"]
   },
   fontFamily: "Outfit, sans-serif",
   headings: { fontFamily: "Outfit, sans-serif" },
