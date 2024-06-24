@@ -2,8 +2,6 @@ import { createTheme, DEFAULT_THEME, mergeMantineTheme } from "@mantine/core";
 
 const themeOverride = createTheme({
   colors: {
-    // #074548 - brunswick-green-9
-    "brunswick-green": ["#15ced7", "#13bdc5", "#11acb3", "#109ba1", "#0e8a90", "#0c787e", "#0a676c", "#074F48", "#074548", "#053436"],
     // #03221f - dark-green-10
     "dark-green": ["#11c4b3", "#10b2a2", "#0ea092", "#0d8e82", "#0b7c71", "#096a61", "#085850", "#05342f", "#05342f", "#03221f"],
     // #1b887e - dark-cyan-4
@@ -15,12 +13,12 @@ const themeOverride = createTheme({
     // #e8e7e3 - sea-salt-1
     "sea-salt": ["#e8e7e3", "#dfded8", "#d6d5cd", "#cdcbc3", "#c5c2b8", "#bcb9ad", "#b3b0a2", "#aaa698", "#a19d8d", "#989482"],
     //#07393C
-    "main-green": ["#edfcfd", "#dcf6f8", "#b3eef2","#89e6eb","#6bdee6","#5adbe3","#4fd8e1","#41bfc8","#32aab2","#12949b"]
+    "primary-color": ["#edfcfd", "#dcf6f8", "#b3eef2", "#89e6eb", "#6bdee6", "#5adbe3", "#4fd8e1", "#41bfc8", "#32aab2", "#12949b"]
   },
   fontFamily: "Outfit, sans-serif",
   headings: { fontFamily: "Outfit, sans-serif" },
   defaultRadius: "xl",
-  primaryColor: "brunswick-green",
+  primaryColor: "primary-color",
   primaryShade: 7
 });
 

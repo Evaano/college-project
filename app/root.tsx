@@ -16,7 +16,7 @@ import { getUser } from "~/session.server";
 import stylesheet from "~/tailwind.css";
 import { theme } from "~/theme";
 import "@mantine/core/styles.css";
-
+import "@mantine/carousel/styles.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
