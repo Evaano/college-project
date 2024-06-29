@@ -1,9 +1,14 @@
 import { Carousel } from "@mantine/carousel";
-import { Box, Button, Container, Group, Image, Paper, Text, Title } from "@mantine/core";
+import { Box, Modal, Button, Container, Group, Image, Paper, Text, Title } from "@mantine/core";
 import type { MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-
 import { useOptionalUser } from "~/utils";
+import { useMediaQuery } from "@mantine/hooks";
+import { url } from "inspector";
+import { useMantineTheme, BackgroundImage, Center, Card, Badge } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { text } from "stream/consumers";
+
 
 const images = [
   "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-1.png",
@@ -50,6 +55,9 @@ export const meta: MetaFunction = () => [{ title: "Remix Notes" }];
 
 export default function Index() {
   const user = useOptionalUser();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const theme = useMantineTheme();
+  const [opened, { open, close }] = useDisclosure(false);
 
   const slides = images.map((url) => (
     <Carousel.Slide key={url}>
@@ -64,7 +72,7 @@ export default function Index() {
           <Title order={1} size={"50px"}><Text span c={"primary-color"} inherit>EVENT {" "}</Text>HUB</Title>
         </Box>
         <Box pos={"relative"}>
-          <Carousel>{slides}</Carousel>
+          <Carousel loop withIndicators>{slides}</Carousel>
           <Box pos={"absolute"} style={{ bottom: "2rem", left: "50%", transform: "translateX(-50%)" }}>
             <Group justify={"center"}>
               {user ? (
@@ -72,14 +80,16 @@ export default function Index() {
                   View Notes for {user.email}
                 </Button>
               ) : (
-                <>
-                  <Button component={Link} to="/join" variant="filled" color={"primary-color"}>
-                    Sign up
-                  </Button>
-                  <Button component={Link} to="/login" variant="filled" color={"black"}>
-                    Log In
-                  </Button>
-                </>
+                !isMobile && (
+                  <>
+                    <Button component={Link} to="/join" variant="filled" color={"primary-color"}>
+                      Sign up
+                    </Button>
+                    <Button component={Link} to="/login" variant="filled" color={"black"}>
+                      Log In
+                    </Button>
+                  </>
+                )
               )}
             </Group>
           </Box>
@@ -111,6 +121,275 @@ export default function Index() {
               </a>
             ))}
           </Group>
+        </Box>
+        <Box pt="lg" ta={"center"}>
+        <Carousel
+          height={420}
+          slideSize="33.333333%"
+          slideGap="sm"
+          loop
+          align="start"
+          slidesToScroll={3}
+          speed={4}
+        >
+
+
+          <Carousel.Slide>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card.Section>
+                <Image
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
+                  height={160}
+                  alt="Norway"
+                />
+              </Card.Section>
+        
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Norway Fjord Adventures</Text>
+                <Badge color="pink">Ongoing</Badge>
+              </Group>
+        
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+                activities on and around the fjords of Norway
+              </Text>
+              <Modal opened={opened} onClose={close} title="Event Details" centered>
+                {<Text>Location: Central Park</Text>}
+              </Modal>
+              <Button onClick={open} color="blue" fullWidth mt="md" radius="md">
+                See More
+              </Button>
+            </Card>
+          </Carousel.Slide>
+
+
+          
+
+          
+          <Carousel.Slide>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card.Section>
+                <Image
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-2.png"
+                  height={160}
+                  alt="Norway"
+                />
+              </Card.Section>
+        
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Norway Fjord Adventures</Text>
+                <Badge color="pink">Ongoing</Badge>
+              </Group>
+        
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+                activities on and around the fjords of Norway
+              </Text>
+        
+              <Button onClick={open} color="blue" fullWidth mt="md" radius="md">
+                See More
+              </Button>
+            </Card>
+          </Carousel.Slide>
+
+
+
+
+
+
+
+          <Carousel.Slide>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card.Section>
+                <Image
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-1.png"
+                  height={160}
+                  alt="Norway"
+                />
+              </Card.Section>
+        
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Norway Fjord Adventures</Text>
+                <Badge color="grey">Finished Event</Badge>
+              </Group>
+        
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+                activities on and around the fjords of Norway
+              </Text>
+        
+              <Button onClick={open} color="blue" fullWidth mt="md" radius="md">
+                See More
+              </Button>
+            </Card>
+          </Carousel.Slide>
+
+
+
+
+          <Carousel.Slide>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card.Section>
+                <Image
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-3.png"
+                  height={160}
+                  alt="Norway"
+                />
+              </Card.Section>
+        
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Norway Fjord Adventures</Text>
+                <Badge color="grey">Finished Event</Badge>
+              </Group>
+        
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+                activities on and around the fjords of Norway
+              </Text>
+        
+              <Button onClick={open} color="blue" fullWidth mt="md" radius="md">
+                See More
+              </Button>
+            </Card>
+          </Carousel.Slide>
+
+
+          <Carousel.Slide>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card.Section>
+                <Image
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-4.png"
+                  height={160}
+                  alt="Norway"
+                />
+              </Card.Section>
+        
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Norway Fjord Adventures</Text>
+                <Badge color="grey">Finished Event</Badge>
+              </Group>
+        
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+                activities on and around the fjords of Norway
+              </Text>
+        
+              <Button onClick={open} color="blue" fullWidth mt="md" radius="md">
+                See More
+              </Button>
+            </Card>
+          </Carousel.Slide>
+
+
+          <Carousel.Slide>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card.Section>
+                <Image
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-5.png"
+                  height={160}
+                  alt="Norway"
+                />
+              </Card.Section>
+        
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Norway Fjord Adventures</Text>
+                <Badge color="grey">Finished Event</Badge>
+              </Group>
+        
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+                activities on and around the fjords of Norway
+              </Text>
+        
+              <Button onClick={open} color="blue" fullWidth mt="md" radius="md">
+                See More
+              </Button>
+            </Card>
+          </Carousel.Slide>
+
+
+
+
+          <Carousel.Slide>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card.Section>
+                <Image
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-6.png"
+                  height={160}
+                  alt="Norway"
+                />
+              </Card.Section>
+        
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Norway Fjord Adventures</Text>
+                <Badge color="grey">Finished Event</Badge>
+              </Group>
+        
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+                activities on and around the fjords of Norway
+              </Text>
+        
+              <Button onClick={open} color="blue" fullWidth mt="md" radius="md">
+                See More
+              </Button>
+            </Card>
+          </Carousel.Slide>
+
+
+          <Carousel.Slide>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card.Section>
+                <Image
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
+                  height={160}
+                  alt="Norway"
+                />
+              </Card.Section>
+        
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Norway Fjord Adventures</Text>
+                <Badge color="grey">Finished Event</Badge>
+              </Group>
+        
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+                activities on and around the fjords of Norway
+              </Text>
+        
+              <Button onClick={open} color="blue" fullWidth mt="md" radius="md">
+                See More
+              </Button>
+            </Card>
+          </Carousel.Slide>
+
+          <Carousel.Slide>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+              <Card.Section>
+                <Image
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-9.png"
+                  height={160}
+                  alt="Norway"
+                />
+              </Card.Section>
+        
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={500}>Norway Fjord Adventures</Text>
+                <Badge color="grey">Finished Event</Badge>
+              </Group>
+        
+              <Text size="sm" c="dimmed">
+                With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+                activities on and around the fjords of Norway
+              </Text>
+        
+              <Button onClick={open} color="blue" fullWidth mt="md" radius="md">
+                See More
+              </Button>
+            </Card>
+          </Carousel.Slide>
+
+        </Carousel>
         </Box>
       </Container>
     </Paper>

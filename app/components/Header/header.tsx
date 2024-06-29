@@ -27,22 +27,19 @@ import cx from 'clsx';
 import { useState } from 'react';
 
 import classes from './header.module.css';
+import customLogo from 'Final.png';
 
 const user = {
-  name: 'Jane Spoonfighter',
-  email: 'janspoon@fighter.dev',
+  name: 'Event Enthusiast',
+  email: 'Event@Enthusiast.dev',
   image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png',
 };
 
 const tabs = [
   'Home',
-  'Orders',
-  'Education',
-  'Community',
-  'Forums',
-  'Support',
-  'Account',
-  'Helpdesk',
+  'Events',
+  'About Us',
+  'Register',
 ];
 
 export function HeaderTabs() {
@@ -60,7 +57,7 @@ export function HeaderTabs() {
     <div className={classes.header}>
       <Container className={classes.mainSection} size="md">
         <Group justify="space-between">
-          <MantineLogo size={28} />
+          <img src={customLogo} alt="Your Custom Logo" style={{ height: 28, width: 'auto' }} />
 
           <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
 
