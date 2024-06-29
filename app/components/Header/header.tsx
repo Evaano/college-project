@@ -23,23 +23,24 @@ import {
   IconSwitchHorizontal,
   IconChevronDown,
 } from '@tabler/icons-react';
-import cx from 'clsx';
 import { useState } from 'react';
-
-import classes from './header.module.css';
-import customLogo from 'Final.png';
+import { ToggleButton } from "~/components/ThemeToggle/toggle-button";
 
 const user = {
-  name: 'Event Enthusiast',
-  email: 'Event@Enthusiast.dev',
+  name: 'Jane Spoonfighter',
+  email: 'janspoon@fighter.dev',
   image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png',
 };
 
 const tabs = [
   'Home',
-  'Events',
-  'About Us',
-  'Register',
+  'Orders',
+  'Education',
+  'Community',
+  'Forums',
+  'Support',
+  'Account',
+  'Helpdesk',
 ];
 
 export function HeaderTabs() {
@@ -54,31 +55,31 @@ export function HeaderTabs() {
   ));
 
   return (
-    <div className={classes.header}>
-      <Container className={classes.mainSection} size="md">
+    <div>
+      <Container size="md" mt={16}>
         <Group justify="space-between">
-          <img src={customLogo} alt="Your Custom Logo" style={{ height: 28, width: 'auto' }} />
+          <MantineLogo size={28} />
 
           <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
 
           <Menu
             width={260}
             position="bottom-end"
+            radius={"md"}
             transitionProps={{ transition: 'pop-top-right' }}
             onClose={() => setUserMenuOpened(false)}
             onOpen={() => setUserMenuOpened(true)}
             withinPortal
           >
             <Menu.Target>
-              <UnstyledButton
-                className={cx(classes.user, { [classes.userActive]: userMenuOpened })}
-              >
+              <UnstyledButton>
                 <Group gap={7}>
                   <Avatar src={user.image} alt={user.name} radius="xl" size={20} />
                   <Text fw={500} size="sm" lh={1} mr={3}>
                     {user.name}
                   </Text>
                   <IconChevronDown style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                  <ToggleButton />
                 </Group>
               </UnstyledButton>
             </Menu.Target>
@@ -163,13 +164,9 @@ export function HeaderTabs() {
       <Container size="md">
         <Tabs
           defaultValue="Home"
-          variant="outline"
           visibleFrom="sm"
-          classNames={{
-            root: classes.tabs,
-            list: classes.tabsList,
-            tab: classes.tab,
-          }}
+          radius={"md"}
+          mt={10}
         >
           <Tabs.List>{items}</Tabs.List>
         </Tabs>
