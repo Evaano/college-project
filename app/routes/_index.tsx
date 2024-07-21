@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Carousel } from '@mantine/carousel';
+import React, { useEffect, useRef } from "react";
+import { Carousel } from "@mantine/carousel";
 import {
   Box,
   Modal,
@@ -63,13 +63,10 @@ const sponsors = [
 
 export const meta: MetaFunction = () => [{ title: "Remix Notes" }];
 
- 
-
 export default function Index() {
   const user = useOptionalUser();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [opened, { open, close }] = useDisclosure(false);
-
 
   const slides = images.map((url) => (
     <Carousel.Slide key={url}>
@@ -106,13 +103,8 @@ export default function Index() {
           >
             <Group justify={"center"}>
               {user ? (
-                <Button
-                  component={Link}
-                  to="/notes"
-                  variant="light"
-                  color="blue"
-                >
-                  View Notes for {user.email}
+                <Button component={Link} to="/">
+                  Logged in as {user.email}
                 </Button>
               ) : (
                 !isMobile && (
@@ -194,7 +186,6 @@ export default function Index() {
             withControls={false}
             withIndicators={true}
             pb={"xl"}
-            
           >
             <Carousel.Slide>
               <Card shadow="sm" padding="lg" radius="md" withBorder>
