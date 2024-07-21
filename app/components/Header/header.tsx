@@ -1,3 +1,4 @@
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import {
   Container,
   Avatar,
@@ -9,6 +10,7 @@ import {
   Burger,
   rem,
   useMantineTheme,
+  Box,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { MantineLogo } from '@mantinex/mantine-logo';
@@ -27,20 +29,16 @@ import { useState } from 'react';
 import { ToggleButton } from "~/components/ThemeToggle/toggle-button";
 
 const user = {
-  name: 'Jane Spoonfighter',
-  email: 'janspoon@fighter.dev',
-  image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png',
+  name: 'Event Enthusiast',
+  email: 'events@maldives.mv',
+  image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png',
 };
 
 const tabs = [
-  'Home',
-  'Orders',
-  'Education',
-  'Community',
-  'Forums',
-  'Support',
-  'Account',
-  'Helpdesk',
+  { name: 'Home', path: '/' },
+  { name: 'Events', path: '/' },
+  { name: 'Contact', path: '/' },
+  { name: 'Register', path: '/' }
 ];
 
 export function HeaderTabs() {
@@ -49,16 +47,21 @@ export function HeaderTabs() {
   const [userMenuOpened, setUserMenuOpened] = useState(false);
 
   const items = tabs.map((tab) => (
-    <Tabs.Tab value={tab} key={tab}>
-      {tab}
+    <Tabs.Tab value={tab.name} key={tab.name}>
+      <Link to={tab.path}>{tab.name}</Link>
     </Tabs.Tab>
   ));
+
 
   return (
     <div>
       <Container size="md" mt={16}>
         <Group justify="space-between">
-          <MantineLogo size={28} />
+        <Box>
+          
+          <Text component="span" color="primary-color">EVENT </Text>
+          <Text component="span" color="secondary-color">HUB</Text>
+        </Box>
 
           <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
 
