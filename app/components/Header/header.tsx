@@ -18,22 +18,13 @@ import {
   IconStar,
   IconMessage,
   IconSettings,
-  IconPlayerPause,
-  IconTrash,
-  IconSwitchHorizontal,
   IconChevronDown,
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { ToggleButton } from "~/components/ThemeToggle/toggle-button";
-
-const user = {
-  name: "Event Enthusiast",
-  email: "events@maldives.mv",
-  image:
-    "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-};
+import { useOptionalUser } from "~/utils";
 
 const tabs = [
   { name: "Home", path: "/" },
@@ -43,6 +34,7 @@ const tabs = [
 ];
 
 export function HeaderTabs() {
+  const user = useOptionalUser();
   const theme = useMantineTheme();
   const [opened, { toggle }] = useDisclosure(false);
   const [, setUserMenuOpened] = useState(false);
@@ -52,6 +44,15 @@ export function HeaderTabs() {
       <Link to={tab.path}>{tab.name}</Link>
     </Tabs.Tab>
   ));
+
+  const handleLogout = async () => {
+    const response = await fetch("/logout", { method: "POST" });
+    if (response.ok) {
+      window.location.href = "/";
+    } else {
+      console.error("Logout failed");
+    }
+  };
 
   return (
     <div>
@@ -81,13 +82,15 @@ export function HeaderTabs() {
               <UnstyledButton>
                 <Group gap={7}>
                   <Avatar
-                    src={user.image}
-                    alt={user.name}
+                    src={
+                      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png"
+                    }
+                    alt={user?.email}
                     radius="xl"
                     size={20}
                   />
                   <Text fw={500} size="sm" lh={1} mr={3}>
-                    {user.name}
+                    {user?.email}
                   </Text>
                   <IconChevronDown
                     style={{ width: rem(12), height: rem(12) }}
@@ -144,16 +147,7 @@ export function HeaderTabs() {
                 Account settings
               </Menu.Item>
               <Menu.Item
-                leftSection={
-                  <IconSwitchHorizontal
-                    style={{ width: rem(16), height: rem(16) }}
-                    stroke={1.5}
-                  />
-                }
-              >
-                Change account
-              </Menu.Item>
-              <Menu.Item
+                onClick={handleLogout}
                 leftSection={
                   <IconLogout
                     style={{ width: rem(16), height: rem(16) }}
@@ -162,31 +156,6 @@ export function HeaderTabs() {
                 }
               >
                 Logout
-              </Menu.Item>
-
-              <Menu.Divider />
-
-              <Menu.Label>Danger zone</Menu.Label>
-              <Menu.Item
-                leftSection={
-                  <IconPlayerPause
-                    style={{ width: rem(16), height: rem(16) }}
-                    stroke={1.5}
-                  />
-                }
-              >
-                Pause subscription
-              </Menu.Item>
-              <Menu.Item
-                color="red"
-                leftSection={
-                  <IconTrash
-                    style={{ width: rem(16), height: rem(16) }}
-                    stroke={1.5}
-                  />
-                }
-              >
-                Delete account
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>

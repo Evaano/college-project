@@ -15,7 +15,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   password Password?
-  notes    Note[]
+  events   Event[]
 }
 
 model Password {
@@ -25,10 +25,16 @@ model Password {
   userId String @unique
 }
 
-model Note {
-  id    String @id @default(cuid())
-  title String
-  body  String
+model Event {
+  id          String @id @default(cuid())
+  image       String
+  name        String
+  location    String
+  description String
+  status      String @default("ongoing")
+
+  eventStart DateTime @default(now())
+  eventEnd   DateTime @default(now())
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
