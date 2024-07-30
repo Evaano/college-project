@@ -60,11 +60,11 @@
 
 .input {
   @mixin dark {
-    color: var(--mantine-color-dark-6);
+    color: var(--mantine-color-white);
   }
 
   @mixin light {
-    color: var(--mantine-color-white);
+    color: var(--mantine-color-dark-6);
   }
 
   &::placeholder {

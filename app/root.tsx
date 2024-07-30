@@ -1,4 +1,5 @@
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -8,7 +9,7 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration
+  ScrollRestoration,
 } from "@remix-run/react";
 
 import { Layout } from "~/components/AppShell/appshell";
@@ -17,10 +18,11 @@ import stylesheet from "~/tailwind.css";
 import { theme } from "~/theme";
 import "@mantine/core/styles.css";
 import "@mantine/carousel/styles.css";
+import "@mantine/notifications/styles.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : [])
+  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -30,23 +32,24 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function App() {
   return (
     <html lang="en" className="h-full">
-    <head>
-      <meta charSet="utf-8" />
-      <meta name="viewport" content="width=device-width,initial-scale=1" />
-      <Meta />
-      <Links />
-      <ColorSchemeScript />
-    </head>
-    <body className="h-full">
-    <MantineProvider theme={theme} defaultColorScheme={"light"}>
-      <Layout>
-        <Outlet />
-      </Layout>
-      <ScrollRestoration />
-      <Scripts />
-      <LiveReload />
-    </MantineProvider>
-    </body>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <Meta />
+        <Links />
+        <ColorSchemeScript />
+      </head>
+      <body className="h-full">
+        <MantineProvider theme={theme} defaultColorScheme={"light"}>
+          <Notifications />
+          <Layout>
+            <Outlet />
+          </Layout>
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </MantineProvider>
+      </body>
     </html>
   );
 }
