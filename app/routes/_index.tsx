@@ -240,10 +240,20 @@ export default function Index() {
 
                   <Group justify="space-between" mt="md" mb="xs">
                     <Text fw={500}>{event.name}</Text>
-                    <Badge color={event.status === "ongoing" ? "pink" : "grey"}>
+                    <Badge
+                      color={
+                        event.status === "ongoing"
+                          ? "blue"
+                          : event.status === "upcoming"
+                            ? "green"
+                            : "grey"
+                      }
+                    >
                       {event.status === "ongoing"
                         ? "Ongoing"
-                        : "Finished Event"}
+                        : event.status === "upcoming"
+                          ? "Upcoming"
+                          : "Finished Event"}
                     </Badge>
                   </Group>
 

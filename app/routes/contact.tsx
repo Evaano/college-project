@@ -11,7 +11,6 @@ import {
 import { notifications } from "@mantine/notifications";
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
-import { HTMLFormElement } from "happy-dom";
 import { useEffect, useRef } from "react";
 import { z } from "zod";
 
@@ -47,10 +46,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (!response.ok) {
     console.error("Error posting to GetForm:", response.statusText);
-    return json(
-      { errors: { general: "Failed to submit form" } },
-      { status: 500 },
-    );
   }
 
   return json({ errors: null }, { status: 200 });

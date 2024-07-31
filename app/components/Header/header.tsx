@@ -30,7 +30,7 @@ const tabs = [
   { name: "Home", path: "/" },
   { name: "Events", path: "/" },
   { name: "Contact", path: "/contact" },
-  { name: "Register", path: "/" },
+  { name: "Register", path: "/register" },
 ];
 
 export function HeaderTabs() {
