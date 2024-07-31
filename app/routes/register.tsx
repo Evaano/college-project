@@ -1,11 +1,14 @@
 import {
+  ActionIcon,
   Button,
   Container,
   Flex,
   Group,
   Modal,
   Paper,
+  rem,
   SimpleGrid,
+  Table,
   Textarea,
   TextInput,
 } from "@mantine/core";
@@ -18,12 +21,14 @@ import {
   LoaderFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import dayjs from "dayjs";
 import { useEffect, useRef } from "react";
 import { z } from "zod";
 
 import { requireUserId } from "~/session.server";
+import { prisma } from "~/db.server";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
 
 export const meta: MetaFunction = () => [{ title: "Register" }];
 
@@ -39,7 +44,13 @@ const formSchema = z.object({
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request);
 
-  return json({ userId });
+  const events = await prisma.event.findMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  return json({ events });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -65,6 +76,7 @@ export default function Register() {
   const currentDateTime = dayjs().toDate();
   const actionData = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
+  const { events } = useLoaderData<typeof loader>();
 
   useEffect(() => {
     if (actionData?.errors === null) {
@@ -77,6 +89,36 @@ export default function Register() {
       formRef.current?.reset();
     }
   }, [actionData]);
+
+  const rows = events.map((event) => (
+    <Table.Tr key={event.id}>
+      <Table.Td>{event.name}</Table.Td>
+      <Table.Td>{event.location}</Table.Td>
+      <Table.Td>{event.description}</Table.Td>
+      <Table.Td>
+        {event.eventStart ? new Date(event.eventStart).toLocaleString() : "N/A"}
+      </Table.Td>
+      <Table.Td>
+        {event.eventEnd ? new Date(event.eventEnd).toLocaleString() : "N/A"}
+      </Table.Td>
+      <Table.Td>
+        <Group gap={0}>
+          <ActionIcon variant="subtle" color="gray">
+            <IconPencil
+              style={{ width: rem(16), height: rem(16) }}
+              stroke={1.5}
+            />
+          </ActionIcon>
+          <ActionIcon variant="subtle" color="red">
+            <IconTrash
+              style={{ width: rem(16), height: rem(16) }}
+              stroke={1.5}
+            />
+          </ActionIcon>
+        </Group>
+      </Table.Td>
+    </Table.Tr>
+  ));
 
   return (
     <Paper>
@@ -152,6 +194,20 @@ export default function Register() {
             </Group>
           </Form>
         </Modal>
+
+        <Table stickyHeader stickyHeaderOffset={60}>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Event Name</Table.Th>
+              <Table.Th>Location</Table.Th>
+              <Table.Th>Description</Table.Th>
+              <Table.Th>Start Date</Table.Th>
+              <Table.Th>End Date</Table.Th>
+              <Table.Th>Action</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{rows}</Table.Tbody>
+        </Table>
       </Container>
     </Paper>
   );

@@ -16,7 +16,8 @@ import {
 import { useMediaQuery, useDisclosure } from "@mantine/hooks";
 import { json, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef, useState } from "react";
 
 import { prisma } from "~/db.server";
 import { useOptionalUser } from "~/utils";
@@ -102,8 +103,7 @@ export default function Index() {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-
-  console.log(events);
+  const autoplay = useRef(Autoplay({ delay: 2000 }));
 
   const slides = featuredEvents.map((event) => (
     <Carousel.Slide key={event.id}>
@@ -129,7 +129,13 @@ export default function Index() {
           </Title>
         </Box>
         <Box pos={"relative"}>
-          <Carousel loop={true}>{slides}</Carousel>
+          <Carousel
+            plugins={[autoplay.current]}
+            onMouseEnter={autoplay.current.stop}
+            onMouseLeave={autoplay.current.reset}
+          >
+            {slides}
+          </Carousel>
           <Box
             pos={"absolute"}
             style={{
