@@ -8,7 +8,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const pinned = useHeadroom({ fixedAt: 120 });
 
   return (
-    <AppShell header={{ height: 90, collapsed: !pinned, offset: false }} padding="md" className="overflow-hidden">
+    <AppShell header={{ height: 90, collapsed: !pinned, offset: false }} padding="0" className="overflow-hidden">
       <AppShell.Header>
         <HeaderTabs />
       </AppShell.Header>

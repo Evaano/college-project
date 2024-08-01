@@ -37,7 +37,7 @@ const user = {
 
 const tabs = [
   { name: "Home", path: "/" },
-  { name: "Events", path: "/" },
+  { name: "Events", path: "/events" },
   { name: "Contact", path: "/contact" },
   { name: "Register", path: "/" },
 ];
