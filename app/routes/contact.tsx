@@ -14,8 +14,8 @@ import { Form, useActionData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 import { z } from "zod";
 
-import { ContactIconsList } from "~/components/contact-icons/contact-icons";
-import classes from "~/components/contact-icons/contact.module.css";
+import { ContactIconsList } from "~/components/Contact-icons/contact-icons";
+import classes from "~/components/Contact-icons/contact.module.css";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
