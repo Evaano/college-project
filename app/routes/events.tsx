@@ -16,6 +16,8 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef } from "react";
 
 import classes from "~/components/Carousel/carousel.module.css";
 
@@ -74,6 +76,7 @@ export const meta: MetaFunction = () => [{ title: "Remix Notes" }];
 
 export default function Events() {
   const [opened, { open, close }] = useDisclosure(false);
+  const autoplay = useRef(Autoplay({ delay: 2000 }));
 
   const slides = featuredEvents.map((event) => (
     <Carousel.Slide key={event.id}>
@@ -99,6 +102,9 @@ export default function Events() {
             style={{ flex: 1 }}
             withIndicators
             withControls={false}
+            plugins={[autoplay.current]}
+            onMouseEnter={autoplay.current.stop}
+            onMouseLeave={autoplay.current.reset}
           >
             {slides}
           </Carousel>
