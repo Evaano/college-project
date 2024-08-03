@@ -130,6 +130,8 @@ export default function Index() {
         </Box>
         <Box pos={"relative"}>
           <Carousel
+            withControls={false}
+            withIndicators={false}
             plugins={[autoplay.current]}
             onMouseEnter={autoplay.current.stop}
             onMouseLeave={autoplay.current.reset}
