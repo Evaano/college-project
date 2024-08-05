@@ -34,10 +34,10 @@ export function ContactIcon({
 }
 
 const MOCKDATA = [
-  { title: "Email", description: "hello@mantine.dev", icon: IconAt },
-  { title: "Phone", description: "+49 (800) 335 35 35", icon: IconPhone },
-  { title: "Address", description: "844 Morris Park avenue", icon: IconMapPin },
-  { title: "Working hours", description: "8 a.m. – 11 p.m.", icon: IconSun },
+  { title: "Email", description: "eventhubmv@gmail.com", icon: IconAt },
+  { title: "Phone", description: "+(960) 9534835", icon: IconPhone },
+  { title: "Address", description: "10539, Hulhumale", icon: IconMapPin },
+  { title: "Working hours", description: "2 p.m. – 5 p.m.", icon: IconSun },
 ];
 
 export function ContactIconsList() {

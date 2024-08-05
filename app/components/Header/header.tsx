@@ -5,13 +5,12 @@ import {
   Group,
   Text,
   Menu,
-  Tabs,
-  Burger,
   rem,
   useMantineTheme,
   Box,
+  Center,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Link } from "@remix-run/react";
 import {
   IconLogout,
   IconHeart,
@@ -21,29 +20,71 @@ import {
   IconChevronDown,
 } from "@tabler/icons-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
 import { ToggleButton } from "~/components/ThemeToggle/toggle-button";
 import { useOptionalUser } from "~/utils";
 
-const tabs = [
-  { name: "Home", path: "/" },
-  { name: "Events", path: "/events" },
-  { name: "Contact", path: "/contact" },
-  { name: "Register", path: "/register" },
-];
+import classes from "./header.module.css";
 
+const links = [
+  { link: "/", label: "Home" },
+  {
+    link: "#1",
+    label: "Events",
+    links: [
+      { link: "/events/view-all", label: "View Events" },
+      { link: "/events/add", label: "Add Events" },
+    ],
+  },
+  { link: "/register", label: "Register" },
+  { link: "/contact", label: "Contact Us" },
+];
 export function HeaderTabs() {
   const user = useOptionalUser();
   const theme = useMantineTheme();
-  const [opened, { toggle }] = useDisclosure(false);
   const [, setUserMenuOpened] = useState(false);
 
-  const items = tabs.map((tab) => (
-    <Tabs.Tab value={tab.name} key={tab.name}>
-      <Link to={tab.path}>{tab.name}</Link>
-    </Tabs.Tab>
-  ));
+  const items = links.map((link) => {
+    const menuItems = link.links?.map((item) => (
+      <Menu.Item key={item.link}>
+        <Link to={item.link} className={classes.link}>
+          {item.label}
+        </Link>
+      </Menu.Item>
+    ));
+
+    if (menuItems) {
+      return (
+        <Menu
+          key={link.label}
+          trigger="hover"
+          transitionProps={{ exitDuration: 0 }}
+          withinPortal
+          radius={"md"}
+        >
+          <Menu.Target>
+            <a
+              href={link.link}
+              className={classes.link}
+              onClick={(event) => event.preventDefault()}
+            >
+              <Center>
+                <span className={classes.linkLabel}>{link.label}</span>
+                <IconChevronDown size="0.9rem" stroke={1.5} />
+              </Center>
+            </a>
+          </Menu.Target>
+          <Menu.Dropdown>{menuItems}</Menu.Dropdown>
+        </Menu>
+      );
+    }
+
+    return (
+      <Link key={link.label} to={link.link} className={classes.link}>
+        {link.label}
+      </Link>
+    );
+  });
 
   const handleLogout = async () => {
     const response = await fetch("/logout", { method: "POST" });
@@ -55,9 +96,9 @@ export function HeaderTabs() {
   };
 
   return (
-    <div>
-      <Container size="md" mt={19}>
-        <Group justify="space-between">
+    <header className={classes.header}>
+      <Container size="md">
+        <div className={classes.inner}>
           <Box>
             <Text component="span" c="primary-color">
               EVENT{" "}
@@ -66,9 +107,9 @@ export function HeaderTabs() {
               HUB
             </Text>
           </Box>
-
-          <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
-
+          <Group gap={5} visibleFrom="sm">
+            {items}
+          </Group>
           <Menu
             width={260}
             position="bottom-end"
@@ -103,28 +144,6 @@ export function HeaderTabs() {
             <Menu.Dropdown>
               <Menu.Item
                 leftSection={
-                  <IconHeart
-                    style={{ width: rem(16), height: rem(16) }}
-                    color={theme.colors.red[6]}
-                    stroke={1.5}
-                  />
-                }
-              >
-                Liked posts
-              </Menu.Item>
-              <Menu.Item
-                leftSection={
-                  <IconStar
-                    style={{ width: rem(16), height: rem(16) }}
-                    color={theme.colors.yellow[6]}
-                    stroke={1.5}
-                  />
-                }
-              >
-                Saved posts
-              </Menu.Item>
-              <Menu.Item
-                leftSection={
                   <IconMessage
                     style={{ width: rem(16), height: rem(16) }}
                     color={theme.colors.blue[6]}
@@ -132,7 +151,7 @@ export function HeaderTabs() {
                   />
                 }
               >
-                Your comments
+                Your Events
               </Menu.Item>
 
               <Menu.Label>Settings</Menu.Label>
@@ -159,13 +178,8 @@ export function HeaderTabs() {
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
-        </Group>
+        </div>
       </Container>
-      <Container size="md">
-        <Tabs defaultValue="Home" visibleFrom="sm" radius={"md"} mt={10}>
-          <Tabs.List>{items}</Tabs.List>
-        </Tabs>
-      </Container>
-    </div>
+    </header>
   );
 }
