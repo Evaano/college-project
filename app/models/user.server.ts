@@ -24,6 +24,7 @@ export async function createUser(email: User["email"], password: string) {
           hash: hashedPassword,
         },
       },
+      roleId: `${process.env.DEFAULT_USER_ROLE_ID}`,
     },
   });
 }
@@ -60,4 +61,11 @@ export async function verifyLogin(
   const { password: _password, ...userWithoutPassword } = userWithPassword;
 
   return userWithoutPassword;
+}
+
+export async function getUserVendors(userId: string) {
+  return prisma.userVendor.findFirst({
+    where: { userId },
+    include: { vendor: true },
+  });
 }

@@ -7,6 +7,7 @@ import {
   Modal,
   Paper,
   rem,
+  Select,
   SimpleGrid,
   Table,
   Textarea,
@@ -29,6 +30,7 @@ import { SetStateAction, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 
 import { prisma } from "~/db.server";
+import { getUserVendors } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
 
 interface Event {
@@ -51,18 +53,22 @@ const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
   start: z.string().datetime(),
   end: z.string().datetime(),
+  category: z.string(),
 });
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request);
+  const userVendor = await getUserVendors(userId);
 
   const events = await prisma.event.findMany({
     where: {
-      userId: userId,
+      vendorId: userVendor?.vendorId,
     },
   });
 
-  return json({ events });
+  const categories = await prisma.category.findMany();
+
+  return json({ events, categories });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -81,6 +87,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const validData = validatedForm.data;
 
+  const userVendor = await getUserVendors(userId);
+
+  if (!userVendor) {
+    throw new Response(null, {
+      status: 404,
+      statusText: "User Vendor Not Found",
+    });
+  }
+
   if (_action === "add") {
     await prisma.event.create({
       data: {
@@ -90,7 +105,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         description: validData.description,
         eventStart: validData.start,
         eventEnd: validData.end,
-        userId: userId,
+        vendorId: userVendor.vendorId,
+        categoryId: validData.category,
       },
     });
   } else if (_action === "edit") {
@@ -103,6 +119,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         description: validData.description,
         eventStart: validData.start,
         eventEnd: validData.end,
+        categoryId: validData.category,
       },
     });
   }
@@ -117,7 +134,7 @@ export default function AddEvents() {
   const currentDateTime = dayjs().toDate();
   const actionData = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
-  const { events } = useLoaderData<typeof loader>();
+  const { events, categories } = useLoaderData<typeof loader>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   useEffect(() => {
@@ -125,7 +142,6 @@ export default function AddEvents() {
       notifications.show({
         title: "All Good!",
         message: "New event added successfully! 😺",
-        radius: "md",
         autoClose: 3000,
       });
       formRef.current?.reset();
@@ -174,6 +190,7 @@ export default function AddEvents() {
   return (
     <Paper>
       <Container
+        size={"lg"}
         style={{
           position: "relative",
           paddingBottom: "4rem",
@@ -186,18 +203,12 @@ export default function AddEvents() {
         </Flex>
 
         {/* Add event modal */}
-        <Modal
-          radius={"md"}
-          opened={addOpened}
-          onClose={closeAdd}
-          title="Add Event"
-        >
+        <Modal opened={addOpened} onClose={closeAdd} title="Add Event">
           <Form method={"post"} ref={formRef}>
             <TextInput
               label="Image"
               withAsterisk
               placeholder="url of the image"
-              radius={"md"}
               name={"image"}
               error={actionData?.errors?.image}
             />
@@ -205,20 +216,17 @@ export default function AddEvents() {
               <TextInput
                 label="Event Name"
                 withAsterisk
-                radius={"md"}
                 name={"name"}
                 error={actionData?.errors?.name}
               />
               <TextInput
                 label="Location"
                 withAsterisk
-                radius={"md"}
                 name={"location"}
                 error={actionData?.errors?.location}
               />
             </SimpleGrid>
             <Textarea
-              radius="md"
               label="Description"
               withAsterisk
               mt={"md"}
@@ -230,20 +238,28 @@ export default function AddEvents() {
               <DateTimePicker
                 label="Start Date"
                 defaultValue={currentDateTime}
-                radius={"md"}
-                mt={"md"}
+                mt={"sm"}
                 name={"start"}
                 error={actionData?.errors?.start}
               />
               <DateTimePicker
                 label="End Date"
                 defaultValue={currentDateTime}
-                radius={"md"}
-                mt={"md"}
+                mt={"sm"}
                 name={"end"}
                 error={actionData?.errors?.end}
               />
             </SimpleGrid>
+            <Select
+              mt={"lg"}
+              label="Category"
+              placeholder="choose category"
+              data={categories.map((category) => ({
+                value: category.id,
+                label: category.name,
+              }))}
+              name={"category"}
+            />
 
             <Group justify="flex-end" mt="md">
               <Button
@@ -260,19 +276,13 @@ export default function AddEvents() {
         </Modal>
 
         {/* Edit event modal */}
-        <Modal
-          radius={"md"}
-          opened={editOpened}
-          onClose={closeEdit}
-          title="Edit Event"
-        >
+        <Modal opened={editOpened} onClose={closeEdit} title="Edit Event">
           <Form method={"post"} ref={formRef}>
             <input type="hidden" name="id" value={selectedEvent?.id} />
             <TextInput
               label="Image"
               withAsterisk
               placeholder="url of the image"
-              radius={"md"}
               name={"image"}
               defaultValue={selectedEvent?.image}
               error={actionData?.errors?.image}
@@ -281,7 +291,6 @@ export default function AddEvents() {
               <TextInput
                 label="Event Name"
                 withAsterisk
-                radius={"md"}
                 name={"name"}
                 defaultValue={selectedEvent?.name}
                 error={actionData?.errors?.name}
@@ -289,14 +298,12 @@ export default function AddEvents() {
               <TextInput
                 label="Location"
                 withAsterisk
-                radius={"md"}
                 name={"location"}
                 defaultValue={selectedEvent?.location}
                 error={actionData?.errors?.location}
               />
             </SimpleGrid>
             <Textarea
-              radius="md"
               label="Description"
               withAsterisk
               mt={"md"}
@@ -313,7 +320,6 @@ export default function AddEvents() {
                     ? new Date(selectedEvent.eventStart)
                     : currentDateTime
                 }
-                radius={"md"}
                 mt={"md"}
                 name={"start"}
                 error={actionData?.errors?.start}
@@ -325,7 +331,6 @@ export default function AddEvents() {
                     ? new Date(selectedEvent.eventEnd)
                     : currentDateTime
                 }
-                radius={"md"}
                 mt={"md"}
                 name={"end"}
                 error={actionData?.errors?.end}

@@ -13,8 +13,6 @@ import {
 import { Link } from "@remix-run/react";
 import {
   IconLogout,
-  IconHeart,
-  IconStar,
   IconMessage,
   IconSettings,
   IconChevronDown,
@@ -34,11 +32,14 @@ const links = [
     links: [
       { link: "/events/view-all", label: "View Events" },
       { link: "/events/add", label: "Add Events" },
+      { link: "/events/calendar", label: "View Calender" },
     ],
   },
   { link: "/register", label: "Register" },
+  { link: "/user/manage", label: "User Management" },
   { link: "/contact", label: "Contact Us" },
 ];
+
 export function HeaderTabs() {
   const user = useOptionalUser();
   const theme = useMantineTheme();
@@ -97,7 +98,7 @@ export function HeaderTabs() {
 
   return (
     <header className={classes.header}>
-      <Container size="md">
+      <Container size="lg">
         <div className={classes.inner}>
           <Box>
             <Text component="span" c="primary-color">

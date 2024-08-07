@@ -5,7 +5,7 @@ import { Outlet } from "@remix-run/react";
 import { requireUserId } from "~/session.server";
 import { safeRedirect } from "~/utils";
 
-export const meta: MetaFunction = () => [{ title: "Events" }];
+export const meta: MetaFunction = () => [{ title: "User" }];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { searchParams } = new URL(request.url);

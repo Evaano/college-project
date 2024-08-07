@@ -80,7 +80,7 @@ export default function ViewAllEvents() {
 
   const slides = featuredEvents.map((event) => (
     <Carousel.Slide key={event.id}>
-      <Image src={event.image} radius={"md"} />
+      <Image src={event.image} />
     </Carousel.Slide>
   ));
 
@@ -138,7 +138,7 @@ export default function ViewAllEvents() {
             >
               {featuredEvents.map((event) => (
                 <Carousel.Slide key={event.id}>
-                  <Card shadow="sm" padding="lg" radius="md" withBorder mx={10}>
+                  <Card shadow="sm" padding="lg" withBorder mx={10}>
                     <Card.Section>
                       <Image
                         src={
@@ -180,7 +180,6 @@ export default function ViewAllEvents() {
                       // }}
                       fullWidth
                       mt="md"
-                      radius="md"
                     >
                       See More
                     </Button>
@@ -219,7 +218,7 @@ export default function ViewAllEvents() {
             >
               {featuredEvents.map((event) => (
                 <Carousel.Slide key={event.id}>
-                  <Card shadow="sm" padding="lg" radius="md" withBorder mx={10}>
+                  <Card shadow="sm" padding="lg" withBorder mx={10}>
                     <Card.Section>
                       <Image
                         src={
@@ -261,7 +260,6 @@ export default function ViewAllEvents() {
                       // }}
                       fullWidth
                       mt="md"
-                      radius="md"
                     >
                       See More
                     </Button>
@@ -300,7 +298,7 @@ export default function ViewAllEvents() {
             >
               {featuredEvents.map((event) => (
                 <Carousel.Slide key={event.id}>
-                  <Card shadow="sm" padding="lg" radius="md" withBorder mx={10}>
+                  <Card shadow="sm" padding="lg" withBorder mx={10}>
                     <Card.Section>
                       <Image
                         src={
@@ -342,7 +340,6 @@ export default function ViewAllEvents() {
                       // }}
                       fullWidth
                       mt="md"
-                      radius="md"
                     >
                       See More
                     </Button>

@@ -1,10 +1,8 @@
 import {
   Anchor,
-  Box,
   Button,
   Checkbox,
   Container,
-  Flex,
   Group,
   Paper,
   PasswordInput,
@@ -106,7 +104,6 @@ export default function LoginPage() {
                 name="email"
                 autoComplete="email"
                 error={actionData?.errors?.email}
-                radius="md"
                 className="w-full"
               />
             </div>
@@ -120,7 +117,6 @@ export default function LoginPage() {
                 ref={passwordRef}
                 autoComplete="current-password"
                 error={actionData?.errors?.password}
-                radius="md"
                 className="w-full"
               />
             </div>
@@ -130,7 +126,6 @@ export default function LoginPage() {
             <Button
               type="submit"
               fullWidth
-              radius="md"
               className="w-full bg-blue-500 hover:bg-blue-600 focus:bg-blue-400 text-white"
             >
               Log in

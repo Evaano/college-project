@@ -1,3 +1,14 @@
+import {
+  Anchor,
+  Button,
+  Checkbox,
+  Container,
+  Group,
+  Paper,
+  PasswordInput,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -10,17 +21,6 @@ import { useEffect, useRef } from "react";
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { createUserSession, getUserId } from "~/session.server";
 import { safeRedirect, validateEmail } from "~/utils";
-import {
-  Anchor,
-  Button,
-  Checkbox,
-  Container,
-  Group,
-  Paper,
-  PasswordInput,
-  Text,
-  TextInput,
-} from "@mantine/core";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request);
@@ -109,7 +109,6 @@ export default function Join() {
                 name="email"
                 autoComplete="email"
                 error={actionData?.errors?.email}
-                radius="md"
                 className="w-full"
               />
             </div>
@@ -123,7 +122,6 @@ export default function Join() {
                 ref={passwordRef}
                 autoComplete="current-password"
                 error={actionData?.errors?.password}
-                radius="md"
                 className="w-full"
               />
             </div>
@@ -133,7 +131,6 @@ export default function Join() {
             <Button
               type="submit"
               fullWidth
-              radius="md"
               className="w-full bg-blue-500 hover:bg-blue-600 focus:bg-blue-400 text-white"
             >
               Sign up

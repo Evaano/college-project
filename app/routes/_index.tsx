@@ -127,6 +127,7 @@ export default function Index() {
   return (
     <Paper>
       <Container
+        size={"lg"}
         style={{
           position: "relative",
           paddingBottom: "4rem",
@@ -235,7 +236,7 @@ export default function Index() {
         <Box pt="lg" ta={"center"}>
           <Carousel
             height={420}
-            slideSize="33.333333%"
+            slideSize="25%"
             slideGap="sm"
             loop
             align="start"

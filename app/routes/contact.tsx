@@ -60,7 +60,6 @@ export default function ContactUs() {
       notifications.show({
         title: "Default notification",
         message: "Hey there, your code is awesome! 🤥",
-        radius: "md",
         autoClose: 3000,
       });
       formRef.current?.reset();
@@ -92,7 +91,6 @@ export default function ContactUs() {
                 label="Email"
                 placeholder="your@email.com"
                 required
-                radius={"md"}
                 classNames={{ input: classes.input, label: classes.inputLabel }}
                 name={"email"}
                 error={actionData?.errors?.email}
@@ -101,7 +99,6 @@ export default function ContactUs() {
                 label="Name"
                 placeholder="John Doe"
                 mt="md"
-                radius={"md"}
                 classNames={{ input: classes.input, label: classes.inputLabel }}
                 name={"name"}
                 error={actionData?.errors?.name}
@@ -111,7 +108,6 @@ export default function ContactUs() {
                 label="Your message"
                 placeholder="I want to order your goods"
                 minRows={4}
-                radius={"md"}
                 mt="md"
                 classNames={{ input: classes.input, label: classes.inputLabel }}
                 name={"message"}
