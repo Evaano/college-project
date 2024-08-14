@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   Button,
+  Checkbox,
   Container,
   Flex,
   Group,
@@ -47,6 +48,7 @@ interface Event {
   description: string;
   eventStart: string;
   eventEnd: string;
+  featured: boolean;
 }
 
 export const meta: MetaFunction = () => [{ title: "Add Event" }];
@@ -60,6 +62,7 @@ const addSchema = z.object({
   start: z.string().datetime(),
   end: z.string().datetime(),
   category: z.string(),
+  featured: z.preprocess((val) => val === "true", z.boolean()).default(false),
 });
 
 const editSchema = z.object({
@@ -71,6 +74,7 @@ const editSchema = z.object({
   start: z.string().datetime().optional(),
   end: z.string().datetime().optional(),
   category: z.string().optional(),
+  featured: z.preprocess((val) => val === "true", z.boolean()).default(false),
 });
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -108,8 +112,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const { _action, ...form } = Object.fromEntries(formData);
   const userId = await requireUserId(request);
-
-  console.log(form);
 
   const userVendor = await prisma.user.findFirst({
     where: {
@@ -149,6 +151,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         eventEnd: validData.end,
         vendorId: userVendor.vendor.id,
         categoryId: validData.category,
+        featured: validData.featured,
       },
     });
   } else if (_action === "edit") {
@@ -174,6 +177,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         eventEnd: validData.end,
         vendorId: userVendor.vendor.id,
         categoryId: validData.category,
+        featured: validData.featured,
       },
     });
   } else if (_action === "delete") {
@@ -210,6 +214,7 @@ export default function AddEvents() {
   const { events, categories } = useLoaderData<typeof loader>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const fetcher = useFetcher();
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     if (actionData?.errors === null) {
@@ -257,6 +262,7 @@ export default function AddEvents() {
       <Table.Td>
         {event.eventEnd ? new Date(event.eventEnd).toLocaleString() : "N/A"}
       </Table.Td>
+      <Table.Td>{event.featured ? "Yes" : "No"}</Table.Td>
       <Table.Td>
         <Group gap={0}>
           <ActionIcon
@@ -358,7 +364,18 @@ export default function AddEvents() {
               name={"category"}
             />
 
-            <Group justify="flex-end" mt="md">
+            <Group justify="space-between" mt="md">
+              <Checkbox
+                defaultChecked={"off"}
+                label="Featured"
+                checked={checked}
+                onChange={(event) => setChecked(event.currentTarget.checked)}
+              />
+              <input
+                type="hidden"
+                value={JSON.stringify(checked)}
+                name="featured"
+              />
               <Button
                 type={"submit"}
                 variant={"filled"}
@@ -434,7 +451,18 @@ export default function AddEvents() {
               />
             </SimpleGrid>
 
-            <Group justify="flex-end" mt="md">
+            <Group justify="space-between" mt="md">
+              <Checkbox
+                defaultValue={"off"}
+                label="Featured"
+                checked={checked}
+                onChange={(event) => setChecked(event.currentTarget.checked)}
+              />
+              <input
+                type="hidden"
+                value={JSON.stringify(checked)}
+                name="featured"
+              />
               <Button
                 type={"submit"}
                 variant={"filled"}
@@ -456,6 +484,7 @@ export default function AddEvents() {
               <Table.Th>Description</Table.Th>
               <Table.Th>Start Date</Table.Th>
               <Table.Th>End Date</Table.Th>
+              <Table.Th>Featured</Table.Th>
               <Table.Th>Action</Table.Th>
             </Table.Tr>
           </Table.Thead>
