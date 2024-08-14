@@ -1,4 +1,5 @@
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
@@ -42,13 +43,15 @@ export default function App() {
       </head>
       <body className="h-full">
         <MantineProvider theme={theme} defaultColorScheme={"light"}>
-          <Notifications />
-          <Layout>
-            <Outlet />
-          </Layout>
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
+          <ModalsProvider>
+            <Notifications />
+            <Layout>
+              <Outlet />
+            </Layout>
+            <ScrollRestoration />
+            <Scripts />
+            <LiveReload />
+          </ModalsProvider>
         </MantineProvider>
       </body>
     </html>
