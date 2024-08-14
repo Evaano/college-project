@@ -10,12 +10,14 @@ import {
   Select,
   SimpleGrid,
   Table,
+  Text,
   Textarea,
   TextInput,
   Title,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useDisclosure } from "@mantine/hooks";
+import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
   ActionFunctionArgs,
@@ -23,7 +25,12 @@ import {
   LoaderFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useFetcher,
+  useLoaderData,
+} from "@remix-run/react";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { SetStateAction, useEffect, useRef, useState } from "react";
@@ -44,7 +51,7 @@ interface Event {
 
 export const meta: MetaFunction = () => [{ title: "Add Event" }];
 
-const formSchema = z.object({
+const addSchema = z.object({
   id: z.string().optional(),
   image: z.string().url(),
   name: z.string().min(1, "Event name is required"),
@@ -53,6 +60,17 @@ const formSchema = z.object({
   start: z.string().datetime(),
   end: z.string().datetime(),
   category: z.string(),
+});
+
+const editSchema = z.object({
+  id: z.string(),
+  image: z.string().url().optional(),
+  name: z.string().optional(),
+  location: z.string().optional(),
+  description: z.string().optional(),
+  start: z.string().datetime().optional(),
+  end: z.string().datetime().optional(),
+  category: z.string().optional(),
 });
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -76,6 +94,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const events = await prisma.event.findMany({
     where: {
+      deletedAt: null,
       vendorId: userVendor.vendor.id,
     },
   });
@@ -90,16 +109,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const { _action, ...form } = Object.fromEntries(formData);
   const userId = await requireUserId(request);
 
-  const validatedForm = formSchema.safeParse(form);
-
-  if (!validatedForm.success) {
-    return json(
-      { errors: validatedForm.error.formErrors.fieldErrors },
-      { status: 400 },
-    );
-  }
-
-  const validData = validatedForm.data;
+  console.log(form);
 
   const userVendor = await prisma.user.findFirst({
     where: {
@@ -118,6 +128,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   if (_action === "add") {
+    const validatedForm = addSchema.safeParse(form);
+
+    if (!validatedForm.success) {
+      return json(
+        { errors: validatedForm.error.formErrors.fieldErrors },
+        { status: 400 },
+      );
+    }
+
+    const validData = validatedForm.data;
+
     await prisma.event.create({
       data: {
         image: validData.image,
@@ -131,6 +152,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       },
     });
   } else if (_action === "edit") {
+    const validatedForm = editSchema.safeParse(form);
+
+    if (!validatedForm.success) {
+      return json(
+        { errors: validatedForm.error.formErrors.fieldErrors },
+        { status: 400 },
+      );
+    }
+
+    const validData = validatedForm.data;
+
     await prisma.event.update({
       where: { id: validData.id },
       data: {
@@ -140,7 +172,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         description: validData.description,
         eventStart: validData.start,
         eventEnd: validData.end,
+        vendorId: userVendor.vendor.id,
         categoryId: validData.category,
+      },
+    });
+  } else if (_action === "delete") {
+    const validatedForm = editSchema.safeParse(form);
+
+    if (!validatedForm.success) {
+      return json(
+        { errors: validatedForm.error.formErrors.fieldErrors },
+        { status: 400 },
+      );
+    }
+
+    const validData = validatedForm.data;
+
+    await prisma.event.update({
+      where: { id: validData.id },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }
@@ -158,12 +209,13 @@ export default function AddEvents() {
   const formRef = useRef<HTMLFormElement>(null);
   const { events, categories } = useLoaderData<typeof loader>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const fetcher = useFetcher();
 
   useEffect(() => {
     if (actionData?.errors === null) {
       notifications.show({
         title: "All Good!",
-        message: "New event added successfully! 😺",
+        message: "Action executed successfully! 😺",
         autoClose: 3000,
       });
       formRef.current?.reset();
@@ -174,6 +226,25 @@ export default function AddEvents() {
     setSelectedEvent(event);
     openEdit();
   };
+
+  const handleDelete = (id: string) => {
+    fetcher.submit({ id: id, _action: "delete" }, { method: "post" });
+  };
+
+  const openModal = (id: string) =>
+    modals.openConfirmModal({
+      title: "Are you sure you want to delete this user?",
+      children: (
+        <Text size="sm">
+          This action will mark the user for deletion. The user will not be
+          permanently removed but will be flagged as deleted in the system.
+        </Text>
+      ),
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      confirmProps: { color: "red" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => handleDelete(id),
+    });
 
   const rows = events.map((event) => (
     <Table.Tr key={event.id}>
@@ -198,7 +269,11 @@ export default function AddEvents() {
               stroke={1.5}
             />
           </ActionIcon>
-          <ActionIcon variant="subtle" color="red">
+          <ActionIcon
+            variant="subtle"
+            color="red"
+            onClick={() => openModal(event.id)}
+          >
             <IconTrash
               style={{ width: rem(16), height: rem(16) }}
               stroke={1.5}
