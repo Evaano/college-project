@@ -62,10 +62,3 @@ export async function verifyLogin(
 
   return userWithoutPassword;
 }
-
-export async function getUserVendors(userId: string) {
-  return prisma.userVendor.findFirst({
-    where: { userId },
-    include: { vendor: true },
-  });
-}

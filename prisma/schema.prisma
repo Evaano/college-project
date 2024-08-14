@@ -8,22 +8,20 @@ generator client {
 }
 
 model User {
-  id     String @id @default(cuid())
-  email  String @unique
-  roleId String
-  role   Role   @relation(fields: [roleId], references: [id])
-
+  id        String    @id @default(cuid())
+  email     String    @unique
+  roleId    String
+  role      Role      @relation(fields: [roleId], references: [id])
+  vendorId  String?
+  vendor    Vendor?   @relation(fields: [vendorId], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-
-  password Password?
-  vendors  UserVendor[]
+  password  Password?
 }
 
 model Password {
-  hash String
-
+  hash   String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String @unique
 }
@@ -51,48 +49,32 @@ model RolePermission {
 }
 
 model Vendor {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String?
   address     String?
   phoneNumber String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  users  UserVendor[]
-  events Event[]
-}
-
-model UserVendor {
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
-
-  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  vendorId String
-
-  @@id([userId, vendorId])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+  events      Event[]
 }
 
 model Event {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   image       String
   name        String
   location    String
   description String
-  status      String @default("ongoing")
-
-  eventStart DateTime @default(now())
-  eventEnd   DateTime @default(now())
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  vendor   Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  vendorId String
-
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  categoryId String
+  status      String   @default("ongoing")
+  eventStart  DateTime @default(now())
+  eventEnd    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  vendorId    String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId  String
 }
 
 model Category {

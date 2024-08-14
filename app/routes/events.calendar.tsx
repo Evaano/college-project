@@ -14,7 +14,6 @@ import { Calendar, momentLocalizer, Event } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { prisma } from "~/db.server";
 import { requireUserId } from "~/session.server";
-import { getUserVendors } from "~/models/user.server";
 
 const localizer = momentLocalizer(moment);
 
@@ -31,7 +30,10 @@ interface CustomEvent extends Event {
   eventEnd: string;
   createdAt: string;
   updatedAt: string;
-  userId: string;
+  vendor: {
+    id: string;
+    name: string;
+  };
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -39,11 +41,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   if (!userId) return redirect("/");
 
-  const userVendor = await getUserVendors(userId);
-
   const events = await prisma.event.findMany({
-    where: {
-      vendorId: userVendor?.vendorId,
+    include: {
+      vendor: true,
     },
   });
 
@@ -103,8 +103,12 @@ export default function EventCalendar() {
           {selectedEvent ? (
             <div>
               <Text fw={500}>{selectedEvent.name}</Text>
+              <Text size="sm">Vendor: {selectedEvent.vendor.name}</Text>
               <Text size="sm">
-                {moment(selectedEvent.eventStart).format("MMMM D, YYYY HH:mm")}{" "}
+                Date & Time:
+                {moment(selectedEvent.eventStart).format(
+                  "MMMM D, YYYY HH:mm",
+                )}{" "}
                 -{moment(selectedEvent.eventEnd).format("MMMM D, YYYY HH:mm")}
               </Text>
               <Text size="sm">Location: {selectedEvent.location}</Text>

@@ -1,20 +1,15 @@
 import {
-  ActionIcon,
   Button,
   Container,
   Flex,
   Group,
-  Modal,
+  NumberInput,
   Paper,
-  rem,
   SimpleGrid,
-  Table,
   Textarea,
   TextInput,
   Title,
 } from "@mantine/core";
-import { DateTimePicker } from "@mantine/dates";
-import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
   ActionFunctionArgs,
@@ -22,65 +17,33 @@ import {
   LoaderFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { IconPencil, IconTrash } from "@tabler/icons-react";
-import dayjs from "dayjs";
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { Form, useActionData, useNavigate } from "@remix-run/react";
+import { useEffect, useRef } from "react";
 import { z } from "zod";
 
 import { prisma } from "~/db.server";
-import { getUserVendors } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
 
-interface Event {
-  id: string;
-  image: string;
-  name: string;
-  location: string;
-  description: string;
-  eventStart: string;
-  eventEnd: string;
-}
-
-export const meta: MetaFunction = () => [{ title: "Add Event" }];
+export const meta: MetaFunction = () => [{ title: "Vendor Registration" }];
 
 const formSchema = z.object({
-  id: z.string().optional(),
-  image: z.string().url(),
-  name: z.string().min(1, "Event name is required"),
-  location: z.string().min(1, "Location is required"),
-  description: z.string().min(1, "Description is required"),
-  start: z.string().datetime(),
-  end: z.string().datetime(),
+  name: z.string().min(1, "Vendor name is required"),
+  email: z.string().toLowerCase().min(1, "Vendor mail is required"),
+  address: z.string().min(1, "Vendor address is required"),
+  phone: z.coerce.string().min(1, "Phone is required"),
+  description: z.string().optional(),
 });
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request);
 
-  const userVendor = await getUserVendors(userId);
-
-  const events = await prisma.event.findMany({
-    where: {
-      vendorId: userVendor?.vendorId,
-    },
-  });
-
-  return json({ events });
+  return json({});
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const { _action, ...form } = Object.fromEntries(formData);
   const userId = await requireUserId(request);
-
-  const userVendor = await getUserVendors(userId);
-
-  if (!userVendor) {
-    throw new Response(null, {
-      status: 404,
-      statusText: "Not Found",
-    });
-  }
 
   const validatedForm = formSchema.safeParse(form);
 
@@ -94,32 +57,35 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const validData = validatedForm.data;
 
   if (_action === "add") {
-    await prisma.event.create({
+    const newVendor = await prisma.vendor.create({
       data: {
-        image: validData.image,
         name: validData.name,
-        location: validData.location,
         description: validData.description,
-        eventStart: validData.start,
-        eventEnd: validData.end,
-        vendorId: userVendor.vendorId,
-        categoryId: "",
+        address: validData.address,
+        phoneNumber: validData.phone,
       },
     });
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        vendorId: newVendor.id,
+      },
+    });
+
+    return json({ errors: null }, { status: 200 });
   }
 
-  return json({ errors: null }, { status: 200 });
+  throw new Response("Internal Server Error", {
+    status: 500,
+    statusText: "Internal Server Error",
+  });
 };
 
-export default function AddEvents() {
-  const [addOpened, { open: openAdd, close: closeAdd }] = useDisclosure(false);
-  const [editOpened, { open: openEdit, close: closeEdit }] =
-    useDisclosure(false);
-  const currentDateTime = dayjs().toDate();
+export default function VendorRegistration() {
   const actionData = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
-  const { events } = useLoaderData<typeof loader>();
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (actionData?.errors === null) {
@@ -129,48 +95,9 @@ export default function AddEvents() {
         radius: "md",
         autoClose: 3000,
       });
-      formRef.current?.reset();
+      navigate("/register");
     }
-  }, [actionData]);
-
-  const handleEditClick = (event: SetStateAction<Event | null>) => {
-    setSelectedEvent(event);
-    openEdit();
-  };
-
-  const rows = events.map((event) => (
-    <Table.Tr key={event.id}>
-      <Table.Td>{event.name}</Table.Td>
-      <Table.Td>{event.location}</Table.Td>
-      <Table.Td>{event.description}</Table.Td>
-      <Table.Td>
-        {event.eventStart ? new Date(event.eventStart).toLocaleString() : "N/A"}
-      </Table.Td>
-      <Table.Td>
-        {event.eventEnd ? new Date(event.eventEnd).toLocaleString() : "N/A"}
-      </Table.Td>
-      <Table.Td>
-        <Group gap={0}>
-          <ActionIcon
-            variant="subtle"
-            color="gray"
-            onClick={() => handleEditClick(event)}
-          >
-            <IconPencil
-              style={{ width: rem(16), height: rem(16) }}
-              stroke={1.5}
-            />
-          </ActionIcon>
-          <ActionIcon variant="subtle" color="red">
-            <IconTrash
-              style={{ width: rem(16), height: rem(16) }}
-              stroke={1.5}
-            />
-          </ActionIcon>
-        </Group>
-      </Table.Td>
-    </Table.Tr>
-  ));
+  }, [actionData, navigate]);
 
   return (
     <Paper>
@@ -183,184 +110,59 @@ export default function AddEvents() {
         }}
       >
         <Flex justify={"space-between"} my="xl">
-          <Title order={2}>My Events</Title>
-          <Button onClick={openAdd}>Add Event</Button>
+          <Title order={2}>Vendor Registration</Title>
         </Flex>
-
-        {/* Add event modal */}
-        <Modal
-          radius={"md"}
-          opened={addOpened}
-          onClose={closeAdd}
-          title="Add Event"
-        >
-          <Form method={"post"} ref={formRef}>
+        <Form method="post" ref={formRef}>
+          <SimpleGrid cols={2} mt="md">
             <TextInput
-              label="Image"
+              label="Vendor Name"
               withAsterisk
-              placeholder="url of the image"
-              radius={"md"}
-              name={"image"}
-              error={actionData?.errors?.image}
-            />
-            <SimpleGrid cols={2} mt={"md"}>
-              <TextInput
-                label="Event Name"
-                withAsterisk
-                radius={"md"}
-                name={"name"}
-                error={actionData?.errors?.name}
-              />
-              <TextInput
-                label="Location"
-                withAsterisk
-                radius={"md"}
-                name={"location"}
-                error={actionData?.errors?.location}
-              />
-            </SimpleGrid>
-            <Textarea
               radius="md"
-              label="Description"
-              withAsterisk
-              mt={"md"}
-              placeholder={"brief description about the event"}
-              name={"description"}
-              error={actionData?.errors?.description}
+              name="name"
+              error={actionData?.errors?.name}
             />
-            <SimpleGrid cols={2} mt={"md"}>
-              <DateTimePicker
-                label="Start Date"
-                defaultValue={currentDateTime}
-                radius={"md"}
-                mt={"md"}
-                name={"start"}
-                error={actionData?.errors?.start}
-              />
-              <DateTimePicker
-                label="End Date"
-                defaultValue={currentDateTime}
-                radius={"md"}
-                mt={"md"}
-                name={"end"}
-                error={actionData?.errors?.end}
-              />
-            </SimpleGrid>
-
-            <Group justify="flex-end" mt="md">
-              <Button
-                type={"submit"}
-                variant={"filled"}
-                mt={"md"}
-                name={"_action"}
-                value={"add"}
-              >
-                Submit
-              </Button>
-            </Group>
-          </Form>
-        </Modal>
-
-        {/* Edit event modal */}
-        <Modal
-          radius={"md"}
-          opened={editOpened}
-          onClose={closeEdit}
-          title="Edit Event"
-        >
-          <Form method={"post"} ref={formRef}>
-            <input type="hidden" name="id" value={selectedEvent?.id} />
             <TextInput
-              label="Image"
-              withAsterisk
-              placeholder="url of the image"
-              radius={"md"}
-              name={"image"}
-              defaultValue={selectedEvent?.image}
-              error={actionData?.errors?.image}
-            />
-            <SimpleGrid cols={2} mt={"md"}>
-              <TextInput
-                label="Event Name"
-                withAsterisk
-                radius={"md"}
-                name={"name"}
-                defaultValue={selectedEvent?.name}
-                error={actionData?.errors?.name}
-              />
-              <TextInput
-                label="Location"
-                withAsterisk
-                radius={"md"}
-                name={"location"}
-                defaultValue={selectedEvent?.location}
-                error={actionData?.errors?.location}
-              />
-            </SimpleGrid>
-            <Textarea
+              label="Address"
               radius="md"
-              label="Description"
               withAsterisk
-              mt={"md"}
-              placeholder={"brief description about the event"}
-              name={"description"}
-              defaultValue={selectedEvent?.description}
-              error={actionData?.errors?.description}
+              name="address"
+              error={actionData?.errors?.address}
             />
-            <SimpleGrid cols={2} mt={"md"}>
-              <DateTimePicker
-                label="Start Date"
-                defaultValue={
-                  selectedEvent
-                    ? new Date(selectedEvent.eventStart)
-                    : currentDateTime
-                }
-                radius={"md"}
-                mt={"md"}
-                name={"start"}
-                error={actionData?.errors?.start}
-              />
-              <DateTimePicker
-                label="End Date"
-                defaultValue={
-                  selectedEvent
-                    ? new Date(selectedEvent.eventEnd)
-                    : currentDateTime
-                }
-                radius={"md"}
-                mt={"md"}
-                name={"end"}
-                error={actionData?.errors?.end}
-              />
-            </SimpleGrid>
-
-            <Group justify="flex-end" mt="md">
-              <Button
-                type={"submit"}
-                variant={"filled"}
-                mt={"md"}
-                name={"_action"}
-                value={"edit"}
-              >
-                Submit
-              </Button>
-            </Group>
-          </Form>
-        </Modal>
-
-        <Table stickyHeader stickyHeaderOffset={60}>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Event Name</Table.Th>
-              <Table.Th>Location</Table.Th>
-              <Table.Th>Description</Table.Th>
-              <Table.Th>Start Date</Table.Th>
-              <Table.Th>End Date</Table.Th>
-              <Table.Th>Action</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+            <NumberInput
+              label="Phone"
+              withAsterisk
+              hideControls
+              radius="md"
+              name="phone"
+              error={actionData?.errors?.phone}
+            />
+            <TextInput
+              label="Email"
+              radius="md"
+              withAsterisk
+              name="email"
+              error={actionData?.errors?.email}
+            />
+          </SimpleGrid>
+          <Textarea
+            radius="md"
+            label="Description"
+            mt="md"
+            name="description"
+            error={actionData?.errors?.description}
+          />
+          <Group justify="flex-end" mt="md">
+            <Button
+              type="submit"
+              variant="filled"
+              mt="md"
+              name="_action"
+              value="add"
+            >
+              Submit
+            </Button>
+          </Group>
+        </Form>
       </Container>
     </Paper>
   );

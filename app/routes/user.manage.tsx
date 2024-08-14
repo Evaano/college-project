@@ -23,6 +23,7 @@ import {
   redirect,
   LoaderFunctionArgs,
   ActionFunctionArgs,
+  MetaFunction,
 } from "@remix-run/node";
 import {
   Form,
@@ -42,6 +43,10 @@ import { safeRedirect } from "~/utils";
 interface User {
   id: string;
   email: string;
+  vendor: {
+    id: string;
+    name: string;
+  } | null;
   role: {
     id: string;
     name: string;
@@ -52,7 +57,10 @@ const formSchema = z.object({
   id: z.string(),
   email: z.string().optional(),
   role: z.string().optional(),
+  vendor: z.string().optional(),
 });
+
+export const meta: MetaFunction = () => [{ title: "User Management" }];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { searchParams } = new URL(request.url);
@@ -65,16 +73,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 
   const roles = await prisma.role.findMany();
+  const vendors = await prisma.vendor.findMany();
   const users = await prisma.user.findMany({
     where: {
       deletedAt: null,
     },
     include: {
       role: true,
+      vendor: true,
     },
   });
 
-  return json({ roles, users });
+  return json({ roles, vendors, users });
 };
 
 // This is enough for the assignment but in a real world application there should be better validations like
@@ -84,9 +94,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const user = await getUserById(userId);
   const { _action, ...form } = Object.fromEntries(formData);
-
-  console.log(_action);
-  console.log(form);
 
   if (!user) {
     throw new Response(null, {
@@ -106,16 +113,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const validData = validatedForm.data;
 
-  console.log(validData);
-
   if (_action === "edit") {
     await prisma.user.update({
       where: { id: validData.id },
       data: {
         email: validData.email,
         roleId: validData.role,
+        vendorId: validData.vendor || null,
       },
     });
+
     return json({ errors: null, message: "User updated successfully" });
   } else if (_action === "delete") {
     await prisma.user.update({
@@ -139,7 +146,7 @@ export default function UserManage() {
   const actionData = useActionData<typeof action>();
   const formRef = useRef<HTMLFormElement>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const { roles, users } = useLoaderData<typeof loader>();
+  const { roles, vendors, users } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
 
   // Could make this better by using dynamic notification messages based on actionData message
@@ -182,6 +189,7 @@ export default function UserManage() {
     <Table.Tr key={user.id}>
       <Table.Td>{user.email}</Table.Td>
       <Table.Td>{user.role.name}</Table.Td>
+      <Table.Td>{user.vendor?.name}</Table.Td>
       <Table.Td>
         <Group gap={0}>
           <ActionIcon
@@ -245,6 +253,17 @@ export default function UserManage() {
                 name="role"
               />
             </SimpleGrid>
+            <Select
+              label="Vendors"
+              mt={"md"}
+              defaultValue={selectedUser?.vendor?.id}
+              data={vendors.map((vendor) => ({
+                value: vendor.id,
+                label: vendor.name,
+              }))}
+              name="vendor"
+              multiple
+            />
 
             <Group justify="flex-end" mt="md">
               <Button
@@ -265,6 +284,7 @@ export default function UserManage() {
             <Table.Tr>
               <Table.Th>Email</Table.Th>
               <Table.Th>Role</Table.Th>
+              <Table.Th>Vendors</Table.Th>
               <Table.Th>Action</Table.Th>
             </Table.Tr>
           </Table.Thead>

@@ -10,7 +10,6 @@ async function seed() {
   // Cleanup existing database
   await prisma.rolePermission.deleteMany();
   await prisma.permission.deleteMany();
-  await prisma.userVendor.deleteMany();
   await prisma.event.deleteMany();
   await prisma.category.deleteMany();
   await prisma.vendor.deleteMany();
@@ -123,7 +122,7 @@ async function seed() {
   });
 
   // Create a dummy vendor
-  await prisma.vendor.create({
+  const vendor = await prisma.vendor.create({
     data: {
       name: "Acme Events Co.",
       description: "We organize the best events in town!",
@@ -149,6 +148,26 @@ async function seed() {
 
   for (const data of categories) {
     await prisma.category.create({ data });
+  }
+
+  const culturalCategory = await prisma.category.findFirst({
+    where: { name: "Cultural" },
+  });
+
+  if (culturalCategory) {
+    await prisma.event.create({
+      data: {
+        image: "https://example.com/event.jpg",
+        name: "Annual Gala",
+        location: "Grand Ballroom, 5th Avenue, New York, NY",
+        description: "A night of celebration and networking.",
+        status: "upcoming",
+        eventStart: new Date("2024-10-15T18:00:00Z"),
+        eventEnd: new Date("2024-10-15T23:00:00Z"),
+        vendorId: vendor.id,
+        categoryId: culturalCategory.id,
+      },
+    });
   }
 
   console.log(`Database has been seeded. 🌱`);

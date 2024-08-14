@@ -30,7 +30,6 @@ import { SetStateAction, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 
 import { prisma } from "~/db.server";
-import { getUserVendors } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
 
 interface Event {
@@ -58,11 +57,26 @@ const formSchema = z.object({
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request);
-  const userVendor = await getUserVendors(userId);
+
+  const userVendor = await prisma.user.findFirst({
+    where: {
+      id: userId,
+    },
+    include: {
+      vendor: true,
+    },
+  });
+
+  if (!userVendor || !userVendor.vendor) {
+    throw new Response(null, {
+      status: 404,
+      statusText: "User Vendor Not Found",
+    });
+  }
 
   const events = await prisma.event.findMany({
     where: {
-      vendorId: userVendor?.vendorId,
+      vendorId: userVendor.vendor.id,
     },
   });
 
@@ -87,9 +101,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const validData = validatedForm.data;
 
-  const userVendor = await getUserVendors(userId);
+  const userVendor = await prisma.user.findFirst({
+    where: {
+      id: userId,
+    },
+    include: {
+      vendor: true,
+    },
+  });
 
-  if (!userVendor) {
+  if (!userVendor || !userVendor.vendor) {
     throw new Response(null, {
       status: 404,
       statusText: "User Vendor Not Found",
@@ -105,7 +126,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         description: validData.description,
         eventStart: validData.start,
         eventEnd: validData.end,
-        vendorId: userVendor.vendorId,
+        vendorId: userVendor.vendor.id,
         categoryId: validData.category,
       },
     });
@@ -127,6 +148,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return json({ errors: null }, { status: 200 });
 };
 
+// Could use file system and store the image in public/uploads but for this assignment image url is fine.
 export default function AddEvents() {
   const [addOpened, { open: openAdd, close: closeAdd }] = useDisclosure(false);
   const [editOpened, { open: openEdit, close: closeEdit }] =
