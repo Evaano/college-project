@@ -66,6 +66,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const roles = await prisma.role.findMany();
   const users = await prisma.user.findMany({
+    where: {
+      deletedAt: null,
+    },
     include: {
       role: true,
     },
@@ -75,7 +78,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 // This is enough for the assignment but in a real world application there should be better validations like
-// checking if the formData email, etc is in the db by doing a zod refine and safeParseAsync.
+// checking if the formData email, etc is in the db by doing a zod refine and safeParseAsync with separate schema for form and fetcher.
 export const action = async ({ request }: ActionFunctionArgs) => {
   const userId = await requireUserId(request);
   const formData = await request.formData();
@@ -115,8 +118,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     });
     return json({ errors: null, message: "User updated successfully" });
   } else if (_action === "delete") {
-    await prisma.user.delete({
+    await prisma.user.update({
       where: { id: validData.id },
+      data: {
+        deletedAt: new Date(),
+      },
     });
     return json({ errors: null, message: "User deleted successfully" });
   }
@@ -218,7 +224,7 @@ export default function UserManage() {
         </Flex>
 
         {/* Edit user modal */}
-        <Modal opened={editOpened} onClose={closeEdit} title="Edit Event">
+        <Modal opened={editOpened} onClose={closeEdit} title="Edit User">
           <Form method="post" ref={formRef}>
             <input type="hidden" name="id" value={selectedUser?.id} />
             <SimpleGrid cols={2} mt="md">
