@@ -36,7 +36,14 @@ const links = [
     ],
   },
   { link: "/register", label: "Register" },
-  { link: "/user/manage", label: "User Management" },
+  {
+    link: "#2",
+    label: "User Management",
+    links: [
+      { link: "/user/manage", label: "Edit Users" },
+      { link: "/auditLog", label: "Audit Logs" },
+    ],
+  },
   { link: "/contact", label: "Contact Us" },
 ];
 

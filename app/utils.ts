@@ -2,6 +2,7 @@ import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
 
 import type { User } from "~/models/user.server";
+import { prisma } from "~/db.server";
 
 const DEFAULT_REDIRECT = "/";
 
@@ -93,4 +94,14 @@ export function can(
     }
   }
   return false;
+}
+
+export async function logAction(action: string, person: string) {
+  await prisma.auditLog.create({
+    data: {
+      action,
+      person,
+      createdAt: new Date(),
+    },
+  });
 }

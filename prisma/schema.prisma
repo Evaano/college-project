@@ -84,3 +84,10 @@ model Category {
   name   String  @unique
   events Event[]
 }
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  person    String
+  createdAt DateTime @default(now())
+}

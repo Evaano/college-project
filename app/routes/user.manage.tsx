@@ -38,7 +38,7 @@ import { z } from "zod";
 import { prisma } from "~/db.server";
 import { getUserById } from "~/models/user.server";
 import { getUser, requireUserId } from "~/session.server";
-import { safeRedirect } from "~/utils";
+import { logAction, safeRedirect } from "~/utils";
 
 interface User {
   id: string;
@@ -114,7 +114,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const validData = validatedForm.data;
 
   if (_action === "edit") {
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: validData.id },
       data: {
         email: validData.email,
@@ -122,15 +122,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         vendorId: validData.vendor || null,
       },
     });
-
+    await logAction(`Updated user details of ${updatedUser.email}`, user.email);
     return json({ errors: null, message: "User updated successfully" });
   } else if (_action === "delete") {
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: validData.id },
       data: {
         deletedAt: new Date(),
       },
     });
+    await logAction(`Deleted ${updatedUser.email}`, user.email);
     return json({ errors: null, message: "User deleted successfully" });
   }
 
