@@ -74,3 +74,23 @@ export function useUser(): User {
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
+
+// Converts permission to an array if it's a string.
+// Checks if any of the user's permissions are in the required permissions.
+// Returns true if a match is found, false otherwise.
+export function can(
+  userPermissions: string[],
+  permission: string | string[],
+): boolean {
+  const permissionsRequired = Array.isArray(permission)
+    ? permission
+    : [permission];
+
+  for (const userPerm of userPermissions) {
+    const hasPerm = permissionsRequired.includes(userPerm);
+    if (hasPerm) {
+      return true;
+    }
+  }
+  return false;
+}

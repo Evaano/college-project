@@ -43,57 +43,6 @@ interface Event {
   };
 }
 
-const featuredEvents = [
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-1.png",
-    id: 1,
-    name: "Event 1",
-    status: "ongoing",
-    description: "some random bs",
-  },
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-2.png",
-    id: 2,
-    name: "Event 1",
-    status: "ongoing",
-    description: "some random bs",
-  },
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-3.png",
-    id: 3,
-    name: "Event 1",
-    status: "ongoing",
-    description: "some random bs",
-  },
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-4.png",
-    id: 4,
-    name: "Event 1",
-    status: "ongoing",
-    description: "some random bs",
-  },
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-4.png",
-    id: 5,
-    name: "Event 1",
-    status: "ongoing",
-    description: "some random bs",
-  },
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-4.png",
-    id: 6,
-    name: "Event 1",
-    status: "ongoing",
-    description: "some random bs",
-  },
-];
-
 export const meta: MetaFunction = () => [{ title: "Remix Notes" }];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -107,11 +56,17 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     },
   });
 
-  return json({ events });
+  const featuredEvents = await prisma.event.findMany({
+    where: {
+      featured: true,
+    },
+  });
+
+  return json({ events, featuredEvents });
 };
 
 export default function ViewAllEvents() {
-  const { events } = useLoaderData<typeof loader>();
+  const { events, featuredEvents } = useLoaderData<typeof loader>();
   const [opened, { open, close }] = useDisclosure(false);
   const autoplay = useRef(Autoplay({ delay: 2000 }));
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -316,17 +271,6 @@ export default function ViewAllEvents() {
             ) : null}
           </Modal>
         </Container>
-
-        <Flex
-          mih={50}
-          gap="md"
-          justify="center"
-          align="center"
-          direction="row"
-          wrap="wrap"
-        >
-          <Button>View All</Button>
-        </Flex>
       </Container>
     </Paper>
   );

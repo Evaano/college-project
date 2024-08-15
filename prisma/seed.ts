@@ -73,6 +73,11 @@ async function seed() {
       },
       {
         roleId: userRole.id,
+        permissionId: createdPermissions.find((p) => p.name === "delete-event")!
+          .id,
+      },
+      {
+        roleId: userRole.id,
         permissionId: createdPermissions.find((p) => p.name === "edit-event")!
           .id,
       },

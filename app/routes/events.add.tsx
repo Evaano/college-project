@@ -39,6 +39,8 @@ import { z } from "zod";
 
 import { prisma } from "~/db.server";
 import { requireUserId } from "~/session.server";
+import { can } from "~/utils";
+import { getUserPermissions } from "~/models/user.server";
 
 interface Event {
   id: string;
@@ -129,7 +131,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     });
   }
 
+  const userPermissions = await getUserPermissions(userId);
+
+  console.log(userPermissions);
+
   if (_action === "add") {
+    const hasUpdatePermission = can(userPermissions, "add-event");
+
+    if (!hasUpdatePermission) {
+      throw new Error("You do not have permission to perform this action");
+    }
+
     const validatedForm = addSchema.safeParse(form);
 
     if (!validatedForm.success) {
@@ -155,6 +167,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       },
     });
   } else if (_action === "edit") {
+    const hasUpdatePermission = can(userPermissions, "edit-event");
+
+    if (!hasUpdatePermission) {
+      throw new Error("You do not have permission to perform this action");
+    }
+
     const validatedForm = editSchema.safeParse(form);
 
     if (!validatedForm.success) {
@@ -181,6 +199,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       },
     });
   } else if (_action === "delete") {
+    const hasUpdatePermission = can(userPermissions, "delete-event");
+
+    if (!hasUpdatePermission) {
+      throw new Error("You do not have permission to perform this action");
+    }
+
     const validatedForm = editSchema.safeParse(form);
 
     if (!validatedForm.success) {
@@ -366,7 +390,7 @@ export default function AddEvents() {
 
             <Group justify="space-between" mt="md">
               <Checkbox
-                defaultChecked={"off"}
+                defaultValue={"off"}
                 label="Featured"
                 checked={checked}
                 onChange={(event) => setChecked(event.currentTarget.checked)}

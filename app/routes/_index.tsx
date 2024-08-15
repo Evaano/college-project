@@ -18,39 +18,17 @@ import { json, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import dayjs from "dayjs";
 import Autoplay from "embla-carousel-autoplay";
+import moment from "moment";
 import { useRef, useState } from "react";
 
 import { prisma } from "~/db.server";
 import { useOptionalUser } from "~/utils";
 
-const featuredEvents = [
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-1.png",
-    id: 1,
-  },
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-2.png",
-    id: 2,
-  },
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-3.png",
-    id: 3,
-  },
-  {
-    image:
-      "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-4.png",
-    id: 4,
-  },
-];
-
 const sponsors = [
   {
-    src: "https://user-images.githubusercontent.com/1500684/157764397-ccd8ea10-b8aa-4772-a99b-35de937319e1.svg",
-    alt: "Fly.io",
-    href: "https://fly.io",
+    src: "https://www.dhiraagu.com.mv/clients/Dhiraagu_CA2BB809-3A22-485B-A518-DA6B6DE653A5/contentms/img/logo/logo-dhiraagu-02.svg",
+    alt: "Dhiraagu",
+    href: "https://www.dhiraagu.com.mv/",
   },
   {
     src: "https://cdn.worldvectorlogo.com/logos/ooredoo-2.svg",
@@ -85,11 +63,14 @@ interface Event {
   id: string;
   name: string;
   description: string;
-  image?: string;
   status: string;
+  image?: string;
+  eventStart: string;
+  eventEnd: string;
   location: string;
-  eventStart: Date;
-  eventEnd: Date;
+  vendor: {
+    name: string;
+  };
 }
 
 export const loader: LoaderFunction = async () => {
@@ -105,20 +86,29 @@ export const loader: LoaderFunction = async () => {
         lt: tomorrow,
       },
     },
+    include: {
+      vendor: true,
+    },
   });
 
-  return json({ events });
+  const featuredEvents = await prisma.event.findMany({
+    where: {
+      featured: true,
+    },
+  });
+
+  return json({ events, featuredEvents });
 };
 
 export default function Index() {
-  const { events } = useLoaderData<typeof loader>();
+  const { events, featuredEvents } = useLoaderData<typeof loader>();
   const user = useOptionalUser();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const autoplay = useRef(Autoplay({ delay: 2000 }));
 
-  const slides = featuredEvents.map((event) => (
+  const slides = featuredEvents.map((event: Event) => (
     <Carousel.Slide key={event.id}>
       <Image src={event.image} radius={"md"} />
     </Carousel.Slide>
@@ -288,7 +278,6 @@ export default function Index() {
                       setSelectedEvent(event);
                       open();
                     }}
-                    color="blue"
                     fullWidth
                     mt="md"
                     radius="md"
@@ -302,21 +291,24 @@ export default function Index() {
         </Box>
       </Container>
 
-      <Modal
-        opened={opened}
-        onClose={close}
-        title="Event Details"
-        centered
-        radius={"md"}
-      >
+      <Modal opened={opened} onClose={close} title="Event Details">
         {selectedEvent ? (
-          <>
-            <Text>Location: {selectedEvent.location}</Text>
-            <Text>
-              Start Date{" "}
-              {new Date(selectedEvent.eventStart).toLocaleDateString()}
+          <div>
+            <Text fw={500}>{selectedEvent.name}</Text>
+            <Text size="sm">Vendor: {selectedEvent.vendor.name}</Text>
+            <Text size="sm">
+              Date & Time:
+              {moment(selectedEvent.eventStart).format("MMMM D, YYYY HH:mm")} -
+              {moment(selectedEvent.eventEnd).format("MMMM D, YYYY HH:mm")}
             </Text>
-          </>
+            <Text size="sm">Location: {selectedEvent.location}</Text>
+            <Text size="sm" c="dimmed">
+              {selectedEvent.description}
+            </Text>
+            <Text size="xs" c="blue">
+              {selectedEvent.status}
+            </Text>
+          </div>
         ) : null}
       </Modal>
     </Paper>

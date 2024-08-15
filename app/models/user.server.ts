@@ -62,3 +62,30 @@ export async function verifyLogin(
 
   return userWithoutPassword;
 }
+
+export async function getUserPermissions(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      role: {
+        include: {
+          permissions: {
+            include: {
+              permission: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    return [];
+  }
+
+  return user.role.permissions.map(
+    (rolePermission) => rolePermission.permission.name,
+  );
+}
