@@ -41,6 +41,9 @@ interface Event {
   vendor: {
     name: string;
   };
+  category: {
+    name: string;
+  };
 }
 
 export const meta: MetaFunction = () => [{ title: "Remix Notes" }];
@@ -53,6 +56,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const events = await prisma.event.findMany({
     include: {
       vendor: true,
+      category: true,
     },
   });
 
@@ -249,6 +253,7 @@ export default function ViewAllEvents() {
             {selectedEvent ? (
               <div>
                 <Text fw={500}>{selectedEvent.name}</Text>
+                <Text size="sm">Category: {selectedEvent.category.name}</Text>
                 <Text size="sm">Vendor: {selectedEvent.vendor.name}</Text>
                 <Text size="sm">
                   Date & Time:

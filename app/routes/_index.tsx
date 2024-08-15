@@ -70,6 +70,9 @@ interface Event {
   vendor: {
     name: string;
   };
+  category: {
+    name: string;
+  };
 }
 
 export const loader: LoaderFunction = async () => {
@@ -79,6 +82,7 @@ export const loader: LoaderFunction = async () => {
     },
     include: {
       vendor: true,
+      category: true,
     },
   });
 
@@ -286,6 +290,7 @@ export default function Index() {
         {selectedEvent ? (
           <div>
             <Text fw={500}>{selectedEvent.name}</Text>
+            <Text size="sm">Category: {selectedEvent.category.name}</Text>
             <Text size="sm">Vendor: {selectedEvent.vendor.name}</Text>
             <Text size="sm">
               Date & Time:
