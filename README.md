@@ -33,11 +33,11 @@ Learn more about [Remix Stacks](https://remix.run/stacks).
 
 Admin account
 - Email: `admin@remix.run`
-- Password: `admin123`
+- Password: `admin@123`
 
 Test account
 - Email: `test@remix.run`
-- Password: `test123`
+- Password: `test@123`
 
 
 ## Testing

@@ -229,20 +229,20 @@ export default function Index() {
           >
             {events.map((event: Event) => (
               <Carousel.Slide key={event.id}>
-                <Card shadow="sm" padding="lg" radius="md" withBorder>
-                  <Card.Section>
+                <Card shadow="sm" padding="lg" radius="md" withBorder h={380}>
+                  <Card.Section h={170}>
                     <Image
-                      src={
-                        event.image ||
-                        "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-1.png"
-                      }
-                      height={160}
+                      src={event.image}
                       alt={event.name}
+                      fit="cover"
+                      h={170}
                     />
                   </Card.Section>
 
                   <Group justify="space-between" mt="md" mb="xs">
-                    <Text fw={500}>{event.name}</Text>
+                    <Text fw={500} lineClamp={1}>
+                      {event.name}
+                    </Text>
                     <Badge
                       color={
                         event.status === "ongoing"
@@ -260,7 +260,7 @@ export default function Index() {
                     </Badge>
                   </Group>
 
-                  <Text size="sm" c="dimmed" ta={"left"}>
+                  <Text size="sm" c="dimmed" ta={"left"} lineClamp={3} mb="md">
                     {event.description}
                   </Text>
 
@@ -270,7 +270,7 @@ export default function Index() {
                       open();
                     }}
                     fullWidth
-                    mt="md"
+                    mt="auto"
                     radius="md"
                   >
                     See More

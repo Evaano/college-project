@@ -194,7 +194,7 @@ async function seed() {
       eventEnd: new Date("2024-06-14T17:00:00Z"),
     },
     {
-      image: "https://i.imgur.com/NFuFbtk.png",
+      image: "https://i.imgur.com/k6AnpiY.jpeg",
       name: "City Marathon",
       description: "Annual marathon through the heart of the city.",
       category: "Tournament",

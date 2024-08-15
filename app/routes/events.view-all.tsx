@@ -4,7 +4,6 @@ import {
   Modal,
   Button,
   Container,
-  Group,
   Image,
   Paper,
   Text,
@@ -12,6 +11,7 @@ import {
   Flex,
   Card,
   Badge,
+  Stack,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -87,20 +87,15 @@ export default function ViewAllEvents() {
       .filter((event) => event.status === status)
       .map((event) => (
         <Carousel.Slide key={event.id}>
-          <Card shadow="sm" padding="lg" withBorder mx={10}>
-            <Card.Section>
-              <Image
-                src={
-                  event.image ||
-                  "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-1.png"
-                }
-                height={160}
-                alt={event.name}
-              />
+          <Card shadow="sm" padding="lg" radius="md" withBorder h={380}>
+            <Card.Section h={170}>
+              <Image src={event.image} alt={event.name} fit="cover" h={170} />
             </Card.Section>
 
-            <Group justify="space-between" mt="md" mb="xs">
-              <Text fw={500}>{event.name}</Text>
+            <Stack mt="md" mb="xs" gap="xs" style={{ height: "150px" }}>
+              <Text fw={500} lineClamp={1}>
+                {event.name}
+              </Text>
               <Badge
                 color={
                   event.status === "ongoing"
@@ -116,11 +111,10 @@ export default function ViewAllEvents() {
                     ? "Upcoming"
                     : "Finished Event"}
               </Badge>
-            </Group>
-
-            <Text size="sm" c="dimmed" ta={"left"}>
-              {event.description}
-            </Text>
+              <Text size="sm" c="dimmed" ta={"left"} lineClamp={3}>
+                {event.description}
+              </Text>
+            </Stack>
 
             <Button fullWidth mt="md" onClick={() => handleSelectEvent(event)}>
               See More
@@ -171,6 +165,7 @@ export default function ViewAllEvents() {
           <Box pos={"relative"} pb={"xl"} style={{ margin: "0", padding: "0" }}>
             <Carousel
               slideSize={310}
+              dragFree
               slideGap="md"
               loop
               height="100%"
@@ -204,6 +199,7 @@ export default function ViewAllEvents() {
               slideSize={310}
               slideGap="md"
               loop
+              dragFree
               height="100%"
               controlsOffset={-2}
               style={{ flex: 1 }}
@@ -235,6 +231,7 @@ export default function ViewAllEvents() {
               slideSize={310}
               slideGap="md"
               loop
+              dragFree
               height="100%"
               controlsOffset={-2}
               style={{ flex: 1 }}
