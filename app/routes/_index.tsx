@@ -16,7 +16,6 @@ import {
 import { useMediaQuery, useDisclosure } from "@mantine/hooks";
 import { json, LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import dayjs from "dayjs";
 import Autoplay from "embla-carousel-autoplay";
 import moment from "moment";
 import { useRef, useState } from "react";
@@ -74,17 +73,9 @@ interface Event {
 }
 
 export const loader: LoaderFunction = async () => {
-  const today = dayjs().startOf("day").toDate();
-  const tomorrow = dayjs().add(1, "day").startOf("day").toDate();
-
-  console.log(today);
-
   const events = await prisma.event.findMany({
     where: {
-      eventStart: {
-        gte: today,
-        lt: tomorrow,
-      },
+      status: "ongoing",
     },
     include: {
       vendor: true,

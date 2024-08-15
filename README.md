@@ -4,10 +4,6 @@
 
 Learn more about [Remix Stacks](https://remix.run/stacks).
 
-```
-npx create-remix@latest --template remix-run/blues-stack
-```
-
 ## What's in the stack
 
 - [Multi-region Fly app deployment](https://fly.io/docs/apps/scale-count/) with [Docker](https://www.docker.com/)
@@ -24,26 +20,25 @@ npx create-remix@latest --template remix-run/blues-stack
 - Linting with [ESLint](https://eslint.org)
 - Static Types with [TypeScript](https://typescriptlang.org)
 
-Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --template your/repo`! Make it your own.
-
 ## Quickstart
 
 - Clone github repo
 - Run ```npm install```
-- Install docker and run it
 - Rename .env.example to .env
+- Install docker
+- Run ```npm run docker```
+- Run ```npx prisma migrate reset```
+- Run ```npx prisma generate```
 - Run  ```npm run dev```
 
-- Email: `rachel@remix.run`
-- Password: `racheliscool`
+Admin account
+- Email: `admin@remix.run`
+- Password: `admin123`
 
-### Relevant code:
+Test account
+- Email: `test@remix.run`
+- Password: `test123`
 
-This is a pretty simple note-taking app, but it's a good example of how you can build a full stack app with Prisma and Remix. The main functionality is creating users, logging in and out, and creating and deleting notes.
-
-- creating users, and logging in and out [./app/models/user.server.ts](./app/models/user.server.ts)
-- user sessions, and verifying them [./app/session.server.ts](./app/session.server.ts)
-- creating, and deleting notes [./app/models/note.server.ts](./app/models/note.server.ts)
 
 ## Testing
 
